@@ -1,18 +1,50 @@
-<form>
-    <div>
-        <h1>Register</h1>
-        <p>Please create an account to get started</p>
-        <hr>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Register - Agrictech</title>
+    </head>
 
-        <label for="email"><b>Email:</b></label><br>
-        <input type="text" placeholder="Enter email" id="email" required><br>
+    <body>
+        <header>
+            <h1>Register</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="services.html">Services</a></li>
+                    <li><a href="products.html">Products</a></li>
+                    <li><a href="blog.html">Blog</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="register.html">Register</a></li>
+                </ul>
+            </nav>
+        </header>
 
-        <label for="pwd"><b>Password:</b></label><br>
-        <input type="password" placeholder="Enter password" id="pwd" required><br>
+        <section>
+            <form>
+                <div>
+                    <h2>Create an Account</h2>
+                    <p>Please create an account to get started</p>
+                    <hr>
 
-        <label for="pwd-repaeat"><b>Repeat Password:</b></label><br>
-        <input type="password" placeholder="Repeat password" id="pwd-repeat" required><br>
+                    <label for="email"><b>Email:</b></label><br>
+                    <input type="email" placeholder="Enter email" id="email" name="email" required><br>
 
-        <button type="submit" class="register-button" >Register</button>
-    </div>
-</form>
+                    <label for="pwd"><b>Password:</b></label><br>
+                    <input type="password" placeholder="Enter password" id="pwd" name="password" required><br>
+
+                    <label for="pwd-repeat"><b>Repeat Password:</b></label><br>
+                    <input type="password" placeholder="Repeat password" id="pwd-repeat" name="password-repeat" required><br>
+
+                    <button type="submit" class="register-button">Register</button>
+                </div>
+            </form>
+        </section>
+
+        <footer>
+            <p>&copy; 2026 Agrictech. All rights reserved</p>
+        </footer>
+    </body>
+</html>
