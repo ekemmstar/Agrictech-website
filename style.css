@@ -1,0 +1,1750 @@
+/* ============================================
+   AGRICTECH WEBSITE - PROFESSIONAL CSS STYLESHEET
+   ============================================
+
+   This stylesheet demonstrates best practices in CSS.
+   Each section includes detailed explanations of WHY we use
+   specific properties and WHAT alternatives exist.
+*/
+
+/* --------------------------------------------
+   SECTION 1: CSS RESET & BASE STYLES
+   --------------------------------------------
+
+   Purpose: Remove browser default styles to ensure consistent
+   appearance across different web browsers (Chrome, Firefox, Safari, etc.)
+*/
+
+/* The Universal Selector (*) targets EVERY element on the page */
+* {
+    /* WHY: Remove default spacing that browsers add automatically
+       WHAT: margin creates space OUTSIDE an element
+       ALTERNATIVE: You could reset each element individually (p, h1, div, etc.)
+       but that would require hundreds of lines of code */
+    margin: 0;
+
+    /* WHY: Remove default inner spacing browsers add to elements
+       WHAT: padding creates space INSIDE an element, between content and border
+       ALTERNATIVE: Same as margin - individual resets would be tedious */
+    padding: 0;
+
+    /* WHY: Makes width/height calculations predictable and easier
+       WHAT: box-sizing determines how width/height are calculated
+
+       DETAILED EXPLANATION:
+       - Default (content-box): width = content only
+         If you set width: 200px, then add padding: 20px and border: 2px,
+         the TOTAL width becomes 244px (200 + 20 + 20 + 2 + 2)
+
+       - border-box: width = content + padding + border
+         If you set width: 200px, padding and border are INCLUDED,
+         so total width stays exactly 200px (content shrinks to fit)
+
+       ALTERNATIVE: Keep default 'content-box' but mentally calculate
+       padding and border into every width - this is error-prone! */
+    box-sizing: border-box;
+}
+
+/* --------------------------------------------
+   SECTION 2: CSS CUSTOM PROPERTIES (VARIABLES)
+   --------------------------------------------
+
+   Purpose: Store reusable values that can be referenced throughout
+   the entire stylesheet. Changes made here update everywhere.
+*/
+
+/* WHY :root selector?
+   WHAT: :root represents the document's root element (html tag)
+   WHY: Variables defined here are available EVERYWHERE in your CSS
+   ALTERNATIVE: Define variables in specific elements (body, section)
+   but then they'd only work within that element's scope */
+:root {
+    /* ========== COLOR PALETTE ==========
+       WHY: Centralizing colors ensures visual consistency
+       WHAT: These variables store color values we'll reuse
+       ALTERNATIVE: Write #2d5016 everywhere, but changing
+       the color scheme would mean finding/replacing hundreds of times */
+
+    /* WHY this specific green (#2d5016)?
+       - Agricultural websites benefit from earth tones
+       - Dark greens convey nature, growth, and sustainability
+       - This shade has enough contrast for text readability
+       ALTERNATIVE COLORS: #1b4d3e (teal-green), #2a5934 (forest green) */
+    --primary-color: #2d5016;
+
+    /* WHY a medium green?
+       - Creates visual hierarchy (darker = more important)
+       - Used for less critical elements than primary
+       - Still maintains brand identity
+       WHAT: #548235 is RGB(84, 130, 53) */
+    --secondary-color: #548235;
+
+    /* WHY a light green accent?
+       - Provides visual variety without introducing new colors
+       - Light colors draw attention without overwhelming
+       - Good for highlights and subtle backgrounds */
+    --accent-color: #a8d08d;
+
+    /* WHY #333333 instead of pure black (#000000)?
+       - Pure black can be harsh and tire the eyes
+       - #333333 is "almost black" - softer and more professional
+       - Better for long reading sessions
+       ALTERNATIVE: #222222 (darker), #444444 (lighter gray) */
+    --text-dark: #333333;
+
+    /* WHY #666666 for secondary text?
+       - Creates visual hierarchy (main text darker, less important text lighter)
+       - Indicates lower priority information
+       - Still maintains readability (contrast ratio: 5.74:1)
+       WHEN TO USE: Captions, descriptions, meta information */
+    --text-light: #666666;
+
+    /* WHY a tinted background instead of pure white?
+       - Pure white (#ffffff) can cause eye strain (too bright)
+       - Subtle green tint reinforces brand identity
+       - Creates depth without distraction
+       ALTERNATIVE: #fafafa (light gray), #f9f9f9 (warmer white) */
+    --background-light: #f5f7f5;
+
+    /* WHY store white as a variable?
+       - Consistency: all colors defined in one place
+       - Flexibility: could change to off-white later
+       - Readability: var(--white) is clearer than #ffffff */
+    --white: #ffffff;
+
+    /* WHY #d4d4d4 for borders?
+       - Light enough to not dominate the design
+       - Dark enough to provide visual separation
+       - Neutral gray works with any color scheme */
+    --border-color: #d4d4d4;
+
+    /* WHY a vibrant green for hover?
+       - Brighter color indicates interactivity
+       - Provides clear feedback to users
+       - Eye-catching without being jarring
+       WHEN USED: Link hovers, button hovers, active states */
+    --hover-color: #70ad47;
+
+    /* ========== TYPOGRAPHY ==========
+       WHY store fonts in variables?
+       - Easy to experiment with different font combinations
+       - Consistent typography across entire site
+       - Change once, update everywhere */
+
+    /* WHY this font stack?
+       WHAT: Browser tries fonts left to right, uses first available
+
+       1. 'Segoe UI' - Modern, clean, pre-installed on Windows
+       2. Tahoma - Backup for older Windows systems
+       3. Geneva - Mac OS fallback
+       4. Verdana - Cross-platform web-safe font
+       5. sans-serif - Generic fallback (browser's default sans-serif)
+
+       WHY sans-serif for body?
+       - Easier to read on screens (no decorative strokes)
+       - Modern and professional appearance
+       - Better at small sizes
+       ALTERNATIVE: Arial, Helvetica, 'Open Sans', Roboto */
+    --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+    /* WHY Georgia for headings?
+       - Serif fonts add elegance and authority
+       - Creates visual contrast with body text
+       - Georgia specifically designed for screen readability
+       - Conveys tradition (appropriate for agriculture)
+       ALTERNATIVE: 'Times New Roman', 'Merriweather', 'Playfair Display' */
+    --font-heading: 'Georgia', serif;
+
+    /* ========== SPACING SYSTEM ==========
+       WHY a consistent spacing scale?
+       - Creates visual rhythm and harmony
+       - Makes design predictable and learnable
+       - Easier to maintain (no random values)
+
+       WHY these specific values?
+       - Based on 8px grid system (8, 16, 32, 48, 64)
+       - Powers of 2 create natural visual relationships
+       - 8px is divisible by common screen densities
+
+       WHY rem units instead of px?
+       - rem = "root em" = relative to root font size
+       - Respects user's browser font settings (accessibility)
+       - If user increases font size, spacing scales proportionally
+       - 1rem typically = 16px (browser default)
+       ALTERNATIVE: Use px (simpler but less accessible) or em (relative to parent) */
+    --spacing-xs: 0.5rem;   /* 8px  - Tiny gaps */
+    --spacing-sm: 1rem;     /* 16px - Default spacing */
+    --spacing-md: 2rem;     /* 32px - Medium gaps */
+    --spacing-lg: 3rem;     /* 48px - Large sections */
+    --spacing-xl: 4rem;     /* 64px - Major divisions */
+
+    /* ========== LAYOUT VARIABLES ========== */
+
+    /* WHY limit maximum width?
+       - Lines longer than ~75 characters are hard to read
+       - 1200px accommodates comfortable reading width
+       - Prevents content from stretching too wide on large monitors
+       - Centers attention on content, not empty space
+       ALTERNATIVE: 960px (narrower), 1440px (wider), 100% (full width) */
+    --max-width: 1200px;
+
+    /* WHY 8px border radius?
+       - Slightly rounded = modern and friendly
+       - Sharp corners (0px) = formal and rigid
+       - Too rounded (20px+) = playful or casual
+       - 8px strikes professional balance
+       ALTERNATIVE: 4px (subtle), 12px (more rounded), 0px (sharp) */
+    --border-radius: 8px;
+
+    /* WHY this box shadow?
+       WHAT: Creates depth by simulating light and shadow
+       FORMAT: horizontal-offset vertical-offset blur-radius color
+
+       0 = No horizontal shift (shadow directly below)
+       2px = Shadow appears 2 pixels down (light from above)
+       8px = Shadow is blurred 8 pixels (soft edge)
+       rgba(0,0,0,0.1) = Black at 10% opacity (subtle)
+
+       WHY these values?
+       - Subtle shadow creates depth without distraction
+       - Downward shadow mimics natural overhead lighting
+       - 10% opacity keeps it professional
+       ALTERNATIVE: 0 4px 6px rgba(0,0,0,0.05) (lighter),
+                    0 10px 25px rgba(0,0,0,0.15) (dramatic) */
+    --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    /* WHY 0.3 seconds for transitions?
+       - Fast enough to feel responsive
+       - Slow enough to be noticeable and smooth
+       - Industry standard for UI transitions
+       SCIENCE: Human eye perceives motion in 100-500ms range
+       ALTERNATIVE: 0.2s (snappier), 0.5s (more dramatic) */
+    --transition-speed: 0.3s;
+}
+
+/* --------------------------------------------
+   SECTION 3: TYPOGRAPHY
+   --------------------------------------------
+
+   Purpose: Control how text appears throughout the site.
+   Good typography = 50% of good design!
+*/
+
+/* WHY style the body element?
+   WHAT: body contains all visible content
+   WHY: Styles here CASCADE down to all child elements
+   (unless overridden by more specific rules)
+   CONCEPT: This is the "cascade" in Cascading Style Sheets */
+body {
+    /* WHY use our variable?
+       - Consistency: same font everywhere
+       - Flexibility: change variable to update entire site
+       - Readability: var(--font-main) is self-documenting */
+    font-family: var(--font-main);
+
+    /* WHY 16px base size?
+       - Web standard (most browsers default to 16px)
+       - Comfortable reading size for most users
+       - Base for rem calculations (1rem = 16px)
+       - Accessible (not too small for aging eyes)
+       ACCESSIBILITY: Never go below 14px for body text
+       ALTERNATIVE: 15px (slightly smaller), 18px (larger, easier to read) */
+    font-size: 16px;
+
+    /* WHY line-height: 1.6?
+       WHAT: Space between lines of text (leading in print design)
+       WHY 1.6 specifically?
+       - 1.6 = 160% of font size (16px text → 25.6px line height)
+       - Creates comfortable "breathing room" between lines
+       - Improves readability and scanning
+       - Reduces eye strain during long reading
+
+       PSYCHOLOGY: Tight line-height (1.0-1.2) = cramped, hard to read
+                   Good range (1.4-1.8) = comfortable
+                   Too loose (2.0+) = disconnected, hard to follow
+
+       ALTERNATIVE: 1.5 (tighter), 1.7 (more spacious) */
+    line-height: 1.6;
+
+    /* WHY this text color?
+       - Dark enough for easy reading
+       - Not pure black (too harsh)
+       - Using variable ensures consistency */
+    color: var(--text-dark);
+
+    /* WHY this background?
+       - Subtle green reinforces brand
+       - Easier on eyes than pure white
+       - Creates cohesive visual theme */
+    background-color: var(--background-light);
+}
+
+/* WHY group all headings?
+   EFFICIENCY: Apply shared properties once instead of six times
+   WHAT: Comma separates selectors (means "and")
+   READS AS: "Apply these styles to h1 AND h2 AND h3..." */
+h1, h2, h3, h4, h5, h6 {
+    /* WHY different font for headings?
+       - Creates visual contrast (distinguishes headings from body)
+       - Serif font adds authority and importance
+       - Hierarchy: different fonts = different purposes
+       PSYCHOLOGY: Serifs = traditional, trustworthy, important */
+    font-family: var(--font-heading);
+
+    /* WHY font-weight: 700?
+       WHAT: Controls how thick/bold text appears
+       SCALE: 100 (thin) → 400 (normal) → 700 (bold) → 900 (heavy)
+       WHY 700?
+       - Bold enough to stand out
+       - Not so heavy it looks aggressive
+       - 700 = traditional "bold" weight
+       ALTERNATIVE: 600 (semi-bold), 800 (extra bold) */
+    font-weight: 700;
+
+    /* WHY tighter line-height for headings?
+       - Headings are typically short (1-2 lines)
+       - Don't need as much vertical space
+       - Tighter spacing makes multi-line headings feel unified
+       - 1.2 = 120% of font size
+       ALTERNATIVE: 1.1 (very tight), 1.3 (bit more space) */
+    line-height: 1.2;
+
+    /* WHY margin-bottom?
+       - Creates space between heading and content below
+       - Visual separation improves scanability
+       - 1rem = comfortable gap
+       WHY NOT margin-top?
+       - Top margins can "collapse" and cause layout issues
+       - Bottom margins are more predictable */
+    margin-bottom: var(--spacing-sm);
+
+    /* WHY primary color for headings?
+       - Reinforces brand identity
+       - Creates visual hierarchy (colored headings stand out)
+       - Draws eye to section titles
+       ALTERNATIVE: Keep default black for more traditional look */
+    color: var(--primary-color);
+}
+
+/* WHY specific sizes for each heading level?
+   PURPOSE: Create clear visual hierarchy
+   PRINCIPLE: Larger = more important
+
+   Size ratio follows "typographic scale"
+   - Each level smaller than previous
+   - Creates harmonious size relationships */
+
+h1 {
+    /* WHY 2.5rem (40px)?
+       - Largest heading = most important information
+       - Page titles, hero headlines
+       - Typically used once per page
+       - 2.5× base font size (2.5 × 16px = 40px)
+       WHEN TO USE: Page titles, main headlines */
+    font-size: 2.5rem;
+
+    /* WHY more bottom margin?
+       - H1s introduce major sections
+       - Extra space creates strong visual break
+       - Separates header from body content clearly */
+    margin-bottom: var(--spacing-md);
+}
+
+h2 {
+    /* WHY 2rem (32px)?
+       - Major section headings
+       - Secondary importance to h1
+       - Smaller but still prominent
+       WHEN TO USE: Main section titles */
+    font-size: 2rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+h3 {
+    /* WHY 1.5rem (24px)?
+       - Sub-section headings
+       - Third level of importance
+       - Still noticeably larger than body text
+       WHEN TO USE: Subsection titles, article headings
+       NOTE: h4, h5, h6 inherit default sizes but share other heading styles */
+    font-size: 1.5rem;
+}
+
+/* WHY style paragraphs separately?
+   WHAT: Paragraphs (<p>) contain most body text */
+p {
+    /* WHY bottom margin?
+       - Separates paragraphs visually
+       - Makes text easier to read and scan
+       - Creates "chunks" of information
+       WHY NOT margin-top?
+       - First paragraph wouldn't need top margin
+       - Bottom margin is more consistent */
+    margin-bottom: var(--spacing-sm);
+
+    /* WHY lighter color than headings?
+       - Creates visual hierarchy
+       - Body text shouldn't compete with headings
+       - Lighter = less emphasis, but still readable
+       CONTRAST: Headings in primary color, body in gray */
+    color: var(--text-light);
+}
+
+/* --------------------------------------------
+   SECTION 4: LINKS
+   --------------------------------------------
+
+   Purpose: Style hyperlinks in all their states
+   WHY multiple states?
+   - Provides visual feedback to users
+   - Improves usability and accessibility
+*/
+
+/* WHY style all <a> elements?
+   DEFAULT BROWSER STYLES: Blue, underlined, purple when visited
+   WHY OVERRIDE: Default blue doesn't match our green theme */
+a {
+    /* WHY this color?
+       - Matches brand (green theme)
+       - Stands out from body text
+       - Traditional "link color" concept (different than text)
+       ACCESSIBILITY: Links must have 3:1 contrast with surrounding text */
+    color: var(--secondary-color);
+
+    /* WHY remove underline by default?
+       WHAT: text-decoration: none removes the line under links
+       WHY: Cleaner, more modern appearance
+       CONTROVERSY: Some argue underlines help identify links
+       COMPROMISE: We add underline on hover (below)
+       ALTERNATIVE: Keep underlines for traditional look */
+    text-decoration: none;
+
+    /* WHY transition?
+       WHAT: Smoothly animates property changes
+       FORMAT: property duration timing-function
+
+       - color = what changes (link color)
+       - var(--transition-speed) = how long (0.3s)
+       - ease = how it changes (starts slow, speeds up, slows down)
+
+       WHY?
+       - Instant changes are jarring
+       - Smooth transition feels polished
+       - Indicates interactivity
+
+       TIMING FUNCTIONS:
+       - ease: slow → fast → slow (most natural)
+       - linear: constant speed (robotic)
+       - ease-in: slow start
+       - ease-out: slow end */
+    transition: color var(--transition-speed) ease;
+}
+
+/* WHY :hover pseudo-class?
+   WHAT: Styles applied when mouse pointer is over the link
+   WHY: Provides immediate visual feedback that link is interactive
+   USER EXPERIENCE: "I'm hovering over something clickable" */
+a:hover {
+    /* WHY change color on hover?
+       - Brighter color indicates interactivity
+       - Visual feedback confirms link is clickable
+       - Draws attention to hovered element */
+    color: var(--hover-color);
+
+    /* WHY add underline on hover?
+       - Extra visual cue of interactivity
+       - Helps users understand "this is definitely a link"
+       - Compromise: no underline normally, underline on hover
+       ALTERNATIVE: Change background color, add border */
+    text-decoration: underline;
+}
+
+/* WHY :focus pseudo-class?
+   WHAT: Styles applied when element receives keyboard focus
+   WHEN: User presses Tab key to navigate
+   WHY CRITICAL: Keyboard users (accessibility) need to see where they are
+   WCAG REQUIREMENT: Focusable elements must have visible focus indicator */
+a:focus {
+    /* WHY outline instead of border?
+       - outline doesn't affect layout (doesn't push other elements)
+       - outline appears outside the element
+       - outline is the standard for focus indicators
+
+       WHAT: outline width style color
+       - 2px = thickness
+       - solid = line style (not dashed or dotted)
+       - var(--hover-color) = our interactive color */
+    outline: 2px solid var(--hover-color);
+
+    /* WHY outline-offset?
+       WHAT: Space between element and outline
+       WHY: 2px gap makes outline more visible
+       - Prevents outline from touching element
+       - Creates visual "breathing room"
+       - More noticeable to keyboard users */
+    outline-offset: 2px;
+}
+
+/* --------------------------------------------
+   SECTION 5: HEADER & NAVIGATION
+   --------------------------------------------
+
+   Purpose: Style the top banner and navigation menu
+   WHY important: First thing users see, sets tone for entire site
+*/
+
+/* WHY style the header element?
+   WHAT: <header> typically contains logo, title, navigation
+   PURPOSE: Create prominent, branded banner */
+header {
+    /* WHY gradient background?
+       WHAT: linear-gradient creates smooth color transition
+       FORMAT: direction, color1 position, color2 position
+
+       - 135deg = diagonal (top-left to bottom-right)
+       - var(--primary-color) 0% = dark green at start
+       - var(--secondary-color) 100% = lighter green at end
+
+       WHY GRADIENT?
+       - More visually interesting than flat color
+       - Creates depth and dimension
+       - Subtle sophistication
+       - Modern design trend
+
+       ALTERNATIVE DIRECTIONS:
+       - 90deg = left to right
+       - 180deg = top to bottom
+       - 0deg = bottom to top
+
+       ALTERNATIVE: Solid color, image background, pattern */
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+
+    /* WHY white text?
+       - High contrast against dark green background
+       - Easy to read
+       - Creates clear visual hierarchy */
+    color: var(--white);
+
+    /* WHY this padding?
+       FORMAT: vertical horizontal (shorthand)
+       - var(--spacing-md) = 32px top/bottom (generous space)
+       - var(--spacing-sm) = 16px left/right
+       WHY MORE vertical than horizontal?
+       - Makes header feel spacious without making it too wide
+       - Vertical space = importance
+       ALTERNATIVE: Same all around, or specific values for each side */
+    padding: var(--spacing-md) var(--spacing-sm);
+
+    /* WHY box-shadow on header?
+       - Separates header from content below
+       - Creates "floating" effect
+       - Adds depth and professionalism
+       SUBTLE: Only 10% opacity keeps it understated */
+    box-shadow: var(--box-shadow);
+
+    /* WHY center text?
+       - Focuses attention
+       - Creates balanced, formal appearance
+       - Logo and title draw eye to center
+       ALTERNATIVE: text-align: left for traditional layout */
+    text-align: center;
+}
+
+/* WHY style h1 inside header differently?
+   SELECTOR EXPLANATION: "header h1" means "h1 that's inside header"
+   WHY SPECIFIC: This h1 has different needs than page content h1s */
+header h1 {
+    /* WHY override inherited color?
+       - Parent heading rule makes h1s green
+       - But header background is green, so green text invisible!
+       - White text contrasts with green background */
+    color: var(--white);
+
+    /* WHY 2.5rem here?
+       - Matches default h1 size (consistency)
+       - Large enough to be prominent hero headline
+       - Balanced within header space */
+    font-size: 2.5rem;
+    margin-bottom: var(--spacing-sm);
+
+    /* WHY text-shadow?
+       WHAT: Creates shadow behind text
+       FORMAT: horizontal vertical blur color
+
+       - 2px right
+       - 2px down
+       - 4px blur
+       - rgba(0,0,0,0.2) = black at 20% opacity
+
+       WHY?
+       - Adds depth and dimension
+       - Makes text "pop" from background
+       - Subtle enhancement (20% opacity)
+       - Improves readability on gradient
+       ALTERNATIVE: Remove for flat, modern look */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* WHY style paragraphs in header?
+   USE CASE: Taglines, subtitles, descriptions */
+header p {
+    /* WHY accent color?
+       - Lighter than white = secondary importance
+       - Still readable against dark background
+       - Adds subtle color variation */
+    color: var(--accent-color);
+
+    /* WHY slightly larger?
+       - More prominent than body text
+       - But smaller than heading
+       - Creates three-level hierarchy: h1 > p > body */
+    font-size: 1.1rem;
+
+    /* WHY margin-top instead of bottom?
+       - Space between heading and tagline
+       - Last element in header, no content below */
+    margin-top: var(--spacing-sm);
+}
+
+/* WHY separate nav element?
+   SEMANTIC HTML: <nav> indicates navigation section
+   ACCESSIBILITY: Screen readers announce "navigation" */
+nav {
+    /* WHY vertical margins?
+       - Space above and below navigation
+       - Separates from header content and page content
+       - 0 left/right = full width */
+    margin: var(--spacing-md) 0;
+}
+
+/* WHY style nav ul specifically?
+   WHAT: Unordered list containing navigation links
+   DEFAULT: Vertical list with bullet points
+   GOAL: Horizontal menu without bullets */
+nav ul {
+    /* WHY remove list-style?
+       DEFAULT: Bullet points before each item
+       WHY REMOVE: Navigation doesn't need bullets
+       - Bullets are visual clutter
+       - Menu items are visually separated other ways (spacing, backgrounds)
+       ALTERNATIVE: list-style-type: disc/circle/square for different bullets */
+    list-style: none;
+
+    /* WHY display: flex?
+       GAME CHANGER: Flexbox makes layouts incredibly easy
+       DEFAULT: List items stack vertically (block display)
+       FLEX: Arranges children horizontally (or vertically with flex-direction)
+
+       WHY FLEXBOX?
+       - Perfect for navigation menus
+       - Handles spacing automatically
+       - Responsive without extra code
+       - Aligns items easily
+
+       ALTERNATIVE: display: inline-block (older technique, less flexible) */
+    display: flex;
+
+    /* WHY flex-wrap: wrap?
+       DEFAULT: All items stay on one line (can overflow)
+       WRAP: Items drop to next line if container too narrow
+
+       WHY?
+       - Responsive behavior without media queries
+       - Prevents horizontal scrolling
+       - Menu adapts to narrow screens automatically
+
+       ALTERNATIVE: nowrap (forces single line) */
+    flex-wrap: wrap;
+
+    /* WHY justify-content: center?
+       WHAT: Controls horizontal alignment of flex items
+       CENTER: Items cluster in middle of container
+
+       OPTIONS:
+       - flex-start: Items at left
+       - flex-end: Items at right
+       - center: Items in middle (our choice)
+       - space-between: Items spread out, space between them
+       - space-around: Items spread out, space around them
+
+       WHY CENTER?
+       - Matches centered header text
+       - Creates balanced, symmetrical appearance
+       - Draws attention to middle of page */
+    justify-content: center;
+
+    /* WHY gap?
+       MODERN CSS: Creates space between flex items
+       WHY BETTER than margins?
+       - Only creates space BETWEEN items (not before/after)
+       - Cleaner than adding margins to each item
+       - No awkward first/last child exceptions
+
+       OLDER TECHNIQUE: Margins on each li item
+       GAP IS BETTER: Simpler, cleaner, more intuitive */
+    gap: var(--spacing-xs);
+}
+
+/* WHY style nav li?
+   BACKUP: Ensures list items display correctly
+   NOTE: flex makes this somewhat redundant, but ensures compatibility */
+nav li {
+    /* WHY inline-block?
+       - Items appear next to each other
+       - Can still apply width, height, margins (unlike inline)
+       - Backup for older browsers
+       NOTE: Flex handles this, but doesn't hurt to specify */
+    display: inline-block;
+}
+
+/* WHY extensively style nav links?
+   GOAL: Make links look like buttons
+   WHY: Modern design pattern - nav links as button-like elements */
+nav a {
+    /* WHY display: block?
+       DEFAULT: Links are inline (only as big as text)
+       BLOCK: Links expand to full size, padding works properly
+       WHY?
+       - Makes entire button clickable (not just text)
+       - Padding creates bigger click target
+       - Better user experience (easier to click) */
+    display: block;
+
+    /* WHY padding?
+       - Creates button-like appearance
+       - Makes links larger and easier to click
+       - Vertical and horizontal spacing around text
+       FORMAT: vertical horizontal
+       MOBILE FRIENDLY: Larger touch targets for fingers */
+    padding: var(--spacing-xs) var(--spacing-sm);
+
+    /* WHY rgba with transparency?
+       rgba(255, 255, 255, 0.1) = white at 10% opacity
+       WHY TRANSPARENT WHITE?
+       - Creates subtle button background
+       - Works on gradient background
+       - Visible but not overpowering
+       - Unified with header colors
+
+       ALTERNATIVE: Solid color, but might clash with gradient */
+    background-color: rgba(255, 255, 255, 0.1);
+
+    /* WHY white text?
+       - Contrast against header background
+       - Overrides default link color
+       - Matches header branding */
+    color: var(--white);
+
+    /* WHY border-radius?
+       - Rounds corners = modern, friendly
+       - Consistent with site-wide border-radius
+       - Button-like appearance */
+    border-radius: var(--border-radius);
+
+    /* WHY transition: all?
+       WHAT: Animates ALL property changes
+       - Background color
+       - Transform (below)
+       - Box-shadow
+
+       WHY?
+       - Smooth, polished interactions
+       - Professional feel
+       - All changes animate together
+
+       ALTERNATIVE: List specific properties for better performance */
+    transition: all var(--transition-speed) ease;
+
+    /* WHY font-weight: 500?
+       SCALE: 400 = normal, 500 = medium, 700 = bold
+       WHY 500?
+       - Slightly bolder than body text
+       - Not as heavy as headings
+       - Improves readability on colored backgrounds
+       - Navigation = important, deserves emphasis */
+    font-weight: 500;
+}
+
+/* WHY elaborate hover effect?
+   GOAL: Multiple visual changes create engaging interaction */
+nav a:hover {
+    /* WHY change background on hover?
+       - Solid color replaces transparent
+       - Clear feedback: "you're hovering here"
+       - Brighter = interactive cue */
+    background-color: var(--hover-color);
+
+    /* WHY remove underline?
+       - Background color provides feedback
+       - Underline unnecessary (too much)
+       - Cleaner button appearance */
+    text-decoration: none;
+
+    /* WHY transform?
+       WHAT: Moves, scales, or rotates elements
+       translateY(-2px) = move UP 2 pixels
+
+       WHY MOVE UP?
+       - Creates "lift" effect
+       - Button appears to rise toward cursor
+       - Playful, engaging interaction
+       - Mimics physical button behavior
+
+       WHY TRANSFORM instead of changing position/margin?
+       - Doesn't affect layout (other elements don't shift)
+       - Hardware accelerated (smooth animation)
+       - Better performance
+
+       ALTERNATIVE: translateY(2px) moves down (press effect) */
+    transform: translateY(-2px);
+
+    /* WHY different shadow on hover?
+       - Reinforces "lifting" illusion
+       - Larger, more pronounced shadow = floating higher
+       - Creates depth perception
+
+       COMPARE: Default shadow: 0 2px 8px
+                Hover shadow: 0 4px 8px (4px down = higher)
+
+       PHYSICS SIMULATION: Higher objects cast longer shadows */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* WHY :active pseudo-class?
+   WHAT: Styles when link is being clicked
+   TIMING: Between mousedown and mouseup
+   PURPOSE: Visual feedback during click */
+nav a:active {
+    /* WHY reset transform?
+       translateY(0) = back to original position
+       WHY?
+       - Creates "press down" effect
+       - Sequence: normal → lift on hover → press on click
+       - Mimics physical button behavior
+       - Satisfying tactile feedback */
+    transform: translateY(0);
+}
+
+/* --------------------------------------------
+   SECTION 6: MAIN CONTENT SECTIONS
+   --------------------------------------------
+
+   Purpose: Style the main content containers
+   WHY sections: Organize content into logical, visual blocks
+*/
+
+/* WHY style <section> elements?
+   SEMANTIC HTML: <section> represents thematic content grouping
+   VISUAL: Each section = card-like container */
+section {
+    /* WHY max-width?
+       PROBLEM: On large screens, lines of text become too long
+       READABILITY: Optimal line length = 50-75 characters
+       1200px provides comfortable reading width
+
+       WHY NOT just width?
+       - max-width allows section to shrink on narrow screens
+       - width: 1200px would overflow on mobile
+       - max-width: 1200px means "1200px maximum, smaller if needed"
+
+       ALTERNATIVE: 960px (narrower), 100% (full width) */
+    max-width: var(--max-width);
+
+    /* WHY this margin?
+       FORMAT: vertical horizontal
+       - var(--spacing-md) = 32px top/bottom between sections
+       - auto = center section horizontally
+
+       HOW AUTO WORKS:
+       - Element has max-width (not full width)
+       - Browser calculates equal left/right margins
+       - Result: centered element
+
+       REQUIREMENT: Only works with width/max-width set
+       ALTERNATIVE: Manual left/right margins */
+    margin: var(--spacing-md) auto;
+
+    /* WHY padding?
+       - Creates inner space (content doesn't touch edges)
+       - Comfortable reading experience
+       - Breathing room around text
+       - All sides equal = balanced appearance */
+    padding: var(--spacing-md);
+
+    /* WHY white background?
+       - Contrast with subtle gray page background
+       - Creates "card" effect
+       - Clear content boundaries
+       - Professional appearance */
+    background-color: var(--white);
+
+    /* WHY border-radius?
+       - Softens corners (friendly, modern)
+       - Consistent with site-wide rounding
+       - "Card" metaphor (like paper with rounded edges) */
+    border-radius: var(--border-radius);
+
+    /* WHY box-shadow?
+       - Creates depth (sections "float" above background)
+       - Separates content visually
+       - Professional polish
+       - Subtle = sophisticated (not cartoonish) */
+    box-shadow: var(--box-shadow);
+}
+
+/* WHY style first section differently?
+   SELECTOR: section:first-of-type
+   WHAT: The first <section> element on the page
+   WHY: First section needs extra space below header */
+section:first-of-type {
+    /* WHY extra top margin?
+       - More space between header and first content
+       - Creates clear visual separation
+       - Emphasizes beginning of main content
+       - Prevents cramped appearance
+       SPACING: var(--spacing-lg) = 48px (larger than usual 32px) */
+    margin-top: var(--spacing-lg);
+}
+
+/* --------------------------------------------
+   SECTION 7: IMAGES
+   --------------------------------------------
+
+   Purpose: Make images responsive and attractive
+   WHY important: Images often break layouts on mobile
+*/
+
+/* WHY style all images?
+   DEFAULT PROBLEM: Images display at full size (can overflow)
+   GOAL: Responsive images that adapt to container */
+img {
+    /* WHY max-width: 100%?
+       CRITICAL FOR RESPONSIVE DESIGN
+
+       WHAT IT MEANS:
+       - Image can be any size UP TO 100% of container
+       - If image is larger than container, it shrinks to fit
+       - If image is smaller, it stays at original size
+
+       WHY NOT width: 100%?
+       - width forces ALL images to full container width
+       - Small images would stretch (pixelated, ugly)
+       - max-width allows natural size up to container width
+
+       RESULT: Images never overflow, never stretch unnaturally
+
+       ALTERNATIVE: width: 100% (forces full width) */
+    max-width: 100%;
+
+    /* WHY height: auto?
+       CRITICAL: Maintains aspect ratio
+
+       WHAT IT DOES:
+       - Height adjusts automatically based on width
+       - Prevents squishing or stretching
+       - Preserves original proportions
+
+       WITHOUT THIS: Setting width without auto height distorts images
+
+       ALTERNATIVE: Don't set height at all (auto is default) */
+    height: auto;
+
+    /* WHY display: block?
+       DEFAULT: Images are inline (like text)
+       PROBLEM: Inline images have mysterious space below them
+
+       WHY SPACE EXISTS:
+       - Inline elements align to text baseline
+       - Space reserved for descenders (y, g, p hang below line)
+
+       BLOCK FIXES THIS:
+       - Removes from text flow
+       - Eliminates extra space
+       - Behaves like a paragraph (block element)
+
+       ALTERNATIVE: vertical-align: top (keeps inline) */
+    display: block;
+
+    /* WHY this margin?
+       FORMAT: top right bottom left (clockwise from top)
+       - 0 top = no space above
+       - auto left/right = centers image horizontally
+       - var(--spacing-md) bottom = space before next content
+
+       WHY CENTER?
+       - Professional appearance
+       - Draws attention to image
+       - Works with display: block */
+    margin: 0 auto var(--spacing-md);
+
+    /* WHY border-radius?
+       - Softens harsh rectangular edges
+       - Consistent with site aesthetic
+       - Modern, friendly appearance
+       - Subtle enhancement */
+    border-radius: var(--border-radius);
+
+    /* WHY box-shadow?
+       - Makes images feel substantial
+       - Separates from background
+       - Professional polish
+       - Depth and dimension */
+    box-shadow: var(--box-shadow);
+}
+
+/* --------------------------------------------
+   SECTION 8: LISTS
+   --------------------------------------------
+
+   Purpose: Style bulleted and numbered lists
+   WHY important: Default list styling is often inadequate
+*/
+
+/* WHY section ul specifically?
+   SELECTOR: ul elements inside sections
+   WHY SPECIFIC: Different styles for navigation vs content lists */
+section ul {
+    /* WHY list-style-position: inside?
+       WHAT: Controls bullet position
+
+       OPTIONS:
+       - outside: Bullet hangs in margin (default)
+       - inside: Bullet appears within content area
+
+       WHY INSIDE?
+       - Bullets align with text
+       - No hanging indents
+       - Cleaner, more contained appearance
+       - Better on narrow screens
+
+       ALTERNATIVE: outside for traditional indented lists */
+    list-style-position: inside;
+
+    /* WHY margin-bottom?
+       - Space after entire list
+       - Separates from next paragraph/content
+       - Visual grouping of list items */
+    margin-bottom: var(--spacing-sm);
+
+    /* WHY padding-left?
+       - Slight indent from section edge
+       - Creates visual hierarchy
+       - List appears nested within section
+       SUBTLE: Only 16px, not dramatic indent */
+    padding-left: var(--spacing-sm);
+}
+
+/* WHY style list items?
+   GOAL: Comfortable spacing between items */
+section li {
+    /* WHY margin-bottom on each item?
+       - Vertical space between list items
+       - Easier to read and scan
+       - Prevents cramped appearance
+       SPACING: 8px provides breathing room without excessive gaps */
+    margin-bottom: var(--spacing-xs);
+
+    /* WHY lighter text color?
+       - Matches paragraph text (consistency)
+       - Distinguishes from headings
+       - Comfortable reading color */
+    color: var(--text-light);
+}
+
+/* WHY style ::marker pseudo-element?
+   WHAT: ::marker targets the bullet/number itself
+   MODERN CSS: Previously, couldn't style bullets directly
+   WHY USEFUL: Customize bullet appearance */
+section ul li::marker {
+    /* WHY colored markers?
+       - Adds subtle brand color
+       - More interesting than black dots
+       - Draws attention to list structure
+       - Reinforces visual theme */
+    color: var(--secondary-color);
+
+    /* WHY bold markers?
+       - Makes bullets more prominent
+       - Provides visual anchor for each item
+       - Balances with text weight
+       ALTERNATIVE: normal weight for subtle bullets */
+    font-weight: bold;
+}
+
+/* --------------------------------------------
+   SECTION 9: TABLES
+   --------------------------------------------
+
+   Purpose: Create professional, readable data tables
+   WHY important: Default tables look terrible
+*/
+
+/* WHY wrap tables in div?
+   PROBLEM: Wide tables overflow on mobile
+   SOLUTION: Container with overflow-x: auto */
+div:has(table) {
+    /* WHY overflow-x: auto?
+       WHAT: Creates horizontal scrollbar if needed
+
+       SCENARIO: Table is 800px wide, phone screen is 375px
+       - overflow: visible = table overflows (breaks layout)
+       - overflow: hidden = table gets cut off (data lost)
+       - overflow: auto = scrollbar appears (data accessible)
+
+       WHY auto not scroll?
+       - auto: Scrollbar only if needed
+       - scroll: Scrollbar always (even if not needed)
+
+       NOTE: This uses :has() - modern CSS
+       ALTERNATIVE: Add class to divs containing tables */
+    overflow-x: auto;
+
+    /* WHY vertical margins?
+       - Space above and below table container
+       - Separates table from other content
+       - Breathing room */
+    margin: var(--spacing-md) 0;
+}
+
+/* WHY style table element? */
+table {
+    /* WHY width: 100%?
+       - Table fills container width
+       - Responsive (adapts to container)
+       - Uses available space efficiently
+       ALTERNATIVE: auto (only as wide as content) */
+    width: 100%;
+
+    /* WHY border-collapse: collapse?
+       DEFAULT: separate (double borders, gaps between cells)
+       COLLAPSE: Single borders, no gaps
+
+       VISUAL DIFFERENCE:
+       - separate: □ □ □ (each cell separate)
+       - collapse: □□□ (cells merged together)
+
+       WHY COLLAPSE?
+       - Cleaner appearance
+       - Professional look
+       - Less visual clutter
+       - Better use of space */
+    border-collapse: collapse;
+
+    /* WHY these margins?
+       - Space around table
+       - Separates from surrounding content */
+    margin: var(--spacing-sm) 0 var(--spacing-md);
+
+    /* WHY white background?
+       - Matches section background
+       - Clean, professional
+       - Improves readability */
+    background-color: var(--white);
+}
+
+/* WHY style caption?
+   WHAT: <caption> is table title
+   WHERE: First element inside <table> */
+caption {
+    /* WHY larger font?
+       - Distinguishes from table data
+       - Acts as table heading
+       - Draws attention */
+    font-size: 1.2rem;
+
+    /* WHY bold?
+       - Emphasizes importance
+       - Clearly labels table purpose
+       - Matches heading treatment */
+    font-weight: bold;
+
+    /* WHY primary color?
+       - Matches heading color (consistency)
+       - Brand identity
+       - Creates hierarchy */
+    color: var(--primary-color);
+
+    /* WHY margin-bottom?
+       - Space between title and table
+       - Visual separation */
+    margin-bottom: var(--spacing-sm);
+
+    /* WHY text-align: left?
+       - Aligns with table content
+       - More readable than centered
+       - Professional appearance
+       ALTERNATIVE: center for formal tables */
+    text-align: left;
+}
+
+/* WHY style thead?
+   WHAT: <thead> contains table header rows */
+thead {
+    /* WHY dark background?
+       - Strong contrast with data rows
+       - Clearly identifies headers
+       - Professional appearance
+       - Draws attention to column labels */
+    background-color: var(--primary-color);
+
+    /* WHY white text?
+       - Contrast against dark background
+       - Easy to read
+       - Matches header/footer treatment */
+    color: var(--white);
+}
+
+/* WHY style th (table headers)?
+   WHAT: <th> elements contain column headings */
+th {
+    /* WHY padding?
+       - Comfortable space around text
+       - Prevents cramped appearance
+       - Makes headers touch-friendly */
+    padding: var(--spacing-sm);
+
+    /* WHY text-align: left?
+       - Matches body text alignment
+       - Easier to scan columns
+       - Left = Western reading pattern
+       ALTERNATIVE: center for numeric data */
+    text-align: left;
+
+    /* WHY font-weight: 600?
+       - Semi-bold = emphasis without heaviness
+       - Distinguishes headers from data
+       - Readable on dark background */
+    font-weight: 600;
+
+    /* WHY text-transform: uppercase?
+       - ALL CAPS = visual emphasis
+       - Clear distinction from data
+       - Professional appearance
+       - Common table header pattern
+       ALTERNATIVE: normal case for softer look */
+    text-transform: uppercase;
+
+    /* WHY letter-spacing?
+       WHAT: Space between characters
+       WHY 0.5px?
+       - Improves readability of uppercase text
+       - Prevents letters from appearing cramped
+       - ALL CAPS needs more space
+       TYPOGRAPHIC PRINCIPLE: Uppercase text benefits from tracking */
+    letter-spacing: 0.5px;
+}
+
+/* WHY style td (table data cells)? */
+td {
+    /* WHY padding?
+       - Space around cell content
+       - Improves readability
+       - Prevents text from touching borders */
+    padding: var(--spacing-sm);
+
+    /* WHY border-bottom?
+       - Separates rows visually
+       - Creates horizontal lines
+       - Easier to read across rows
+       - Professional appearance
+
+       WHY NOT borders all around?
+       - Too much visual clutter
+       - Bottom only = cleaner
+       - Grid of lines is overwhelming */
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* WHY :nth-child(even)?
+   WHAT: Targets every even-numbered row (2, 4, 6, ...)
+   PATTERN: Creates "zebra striping"
+   WHY?
+   - Alternating colors help eye track across rows
+   - Reduces errors when reading data
+   - Professional appearance
+   - Improves usability of wide tables
+
+   ALTERNATIVE: :nth-child(odd) for different pattern */
+tbody tr:nth-child(even) {
+    /* WHY light background?
+       - Subtle contrast with white rows
+       - Visible but not distracting
+       - Helps distinguish rows */
+    background-color: var(--background-light);
+}
+
+/* WHY hover effect on rows?
+   PURPOSE: Interactive feedback when examining data */
+tbody tr:hover {
+    /* WHY change background on hover?
+       - Highlights entire row
+       - Easier to read across columns
+       - Visual feedback
+       - Improves usability */
+    background-color: var(--accent-color);
+
+    /* WHY transition?
+       - Smooth color change
+       - Polished interaction
+       - Not jarring */
+    transition: background-color var(--transition-speed) ease;
+}
+
+/* --------------------------------------------
+   SECTION 10: FOOTER
+   --------------------------------------------
+
+   Purpose: Consistent bottom section across all pages
+   WHY: Provides closure, copyright, contact info
+*/
+
+/* WHY style footer element? */
+footer {
+    /* WHY same color as header?
+       - Creates visual bookends (matching top/bottom)
+       - Brand consistency
+       - Professional appearance
+       - Frames content */
+    background-color: var(--primary-color);
+
+    /* WHY white text?
+       - Contrast against dark background
+       - Matches header treatment
+       - Easy to read */
+    color: var(--white);
+
+    /* WHY center text?
+       - Balanced appearance
+       - Formal presentation
+       - Common footer pattern */
+    text-align: center;
+
+    /* WHY this padding?
+       - Comfortable space around text
+       - Prevents cramped appearance
+       - Balanced vertical/horizontal space */
+    padding: var(--spacing-md) var(--spacing-sm);
+
+    /* WHY large top margin?
+       - Significant space before footer
+       - Clear separation from content
+       - Footer feels like separate section
+       - Pushes footer down (prevents cramped pages) */
+    margin-top: var(--spacing-xl);
+
+    /* WHY shadow on TOP?
+       WHAT: 0 -2px 8px
+       - 0 = no horizontal offset
+       - -2px = shadow above (negative = upward)
+       - 8px = blur
+
+       WHY UPWARD SHADOW?
+       - Separates from content above
+       - Creates floating effect
+       - Mirrors header shadow (symmetry) */
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* WHY style footer paragraphs? */
+footer p {
+    /* WHY override inherited color?
+       - Parent paragraph rule makes text gray
+       - Footer needs white text
+       - Ensures visibility on dark background */
+    color: var(--white);
+
+    /* WHY margin: 0?
+       - Removes default paragraph margin
+       - Prevents extra space in footer
+       - Compact appearance */
+    margin: 0;
+
+    /* WHY smaller font?
+       - De-emphasizes footer content
+       - Indicates secondary information
+       - Common pattern for copyright/legal text
+       - 0.9rem = 14.4px (smaller than 16px body) */
+    font-size: 0.9rem;
+}
+
+/* --------------------------------------------
+   SECTION 11: RESPONSIVE DESIGN
+   --------------------------------------------
+
+   Purpose: Adapt layout for different screen sizes
+   WHY: Websites must work on phones, tablets, desktops
+*/
+
+/* WHAT ARE MEDIA QUERIES?
+   Conditional CSS that applies only when certain conditions are met
+   FORMAT: @media (condition) { styles }
+   CONDITION: Usually screen width */
+
+/* TABLETS AND SMALLER DEVICES */
+@media (max-width: 768px) {
+    /* WHAT: max-width: 768px
+       MEANS: "Apply these styles when screen is 768px or narrower"
+       TARGETS: Tablets in portrait, smaller laptops
+
+       WHY 768px?
+       - Common tablet width
+       - Industry standard breakpoint
+       - iPad portrait = 768px
+
+       ALTERNATIVE BREAKPOINTS:
+       - 640px (smaller tablets)
+       - 1024px (larger tablets/small laptops) */
+
+    h1 {
+        /* WHY smaller?
+           PROBLEM: 40px heading too large on narrow screen
+           SOLUTION: 32px (2rem) fits better
+           WHY: Large text takes too much vertical space on mobile */
+        font-size: 2rem;
+    }
+
+    h2 {
+        /* WHY 1.5rem (24px)?
+           - Proportionally smaller than h1
+           - Maintains hierarchy
+           - Fits narrow screens */
+        font-size: 1.5rem;
+    }
+
+    section {
+        /* WHY reduce padding?
+           PROBLEM: Large padding wastes precious mobile space
+           SOLUTION: Smaller padding (16px instead of 32px)
+           WHY: Mobile screens need efficient use of space */
+        padding: var(--spacing-sm);
+
+        /* WHY reduce margin?
+           - Tighter spacing on mobile
+           - More content visible
+           - Still maintains separation */
+        margin: var(--spacing-sm);
+    }
+
+    nav ul {
+        /* WHY flex-direction: column?
+           DEFAULT: Horizontal (row)
+           COLUMN: Stacks items vertically
+
+           WHY?
+           PROBLEM: Horizontal menu too wide for mobile
+           SOLUTION: Vertical menu fits perfectly
+           RESULT: Navigation items stack in list
+
+           ALTERNATIVE: Hamburger menu (more complex) */
+        flex-direction: column;
+
+        /* WHY keep gap?
+           - Vertical space between stacked links
+           - Prevents cramped menu
+           - Touch-friendly spacing */
+        gap: var(--spacing-xs);
+    }
+
+    nav a {
+        /* WHY width: 100%?
+           - Full-width buttons on mobile
+           - Larger click/touch targets
+           - Easier to tap with fingers
+           - Professional mobile appearance
+           FINGER FRIENDLY: Bigger targets = fewer mis-taps */
+        width: 100%;
+    }
+}
+
+/* MOBILE PHONES */
+@media (max-width: 480px) {
+    /* WHAT: max-width: 480px
+       MEANS: "Apply when screen is 480px or narrower"
+       TARGETS: Phones in portrait orientation
+
+       WHY 480px?
+       - Common phone width
+       - iPhone 6/7/8 = 375px
+       - 480px catches most phones
+
+       NOTE: These styles ADD to tablet styles above
+       (both media queries apply on phones) */
+
+    body {
+        /* WHY smaller base font?
+           - More content fits on screen
+           - Still readable (14px minimum recommended)
+           - Proportionally scales with rem units
+           RESULT: All rem sizes shrink proportionally */
+        font-size: 14px;
+    }
+
+    h1 {
+        /* WHY even smaller?
+           - 28px (1.75rem) appropriate for small screens
+           - Prevents heading from dominating screen
+           - Still prominent but not overwhelming */
+        font-size: 1.75rem;
+    }
+
+    header, footer {
+        /* WHY minimal padding?
+           - Conserves vertical space
+           - More content visible
+           - Still has some breathing room */
+        padding: var(--spacing-sm);
+    }
+
+    section {
+        /* WHY tiny margins?
+           - Maximum content area
+           - Minimal wasted space
+           - Still maintains visual separation */
+        margin: var(--spacing-xs);
+        padding: var(--spacing-sm);
+    }
+
+    table {
+        /* WHY smaller table text?
+           - Fits more columns on screen
+           - 0.9rem = 12.6px (14px base × 0.9)
+           - Readable but compact
+           ACCESSIBILITY: Minimum 12px recommended */
+        font-size: 0.9rem;
+    }
+
+    th, td {
+        /* WHY reduce padding?
+           - Compact table cells
+           - More data visible
+           - Prevents excessive scrolling */
+        padding: var(--spacing-xs);
+    }
+}
+
+/* --------------------------------------------
+   SECTION 12: UTILITY CLASSES
+   --------------------------------------------
+
+   Purpose: Reusable classes for common patterns
+   WHY: Avoid repeating CSS, apply via HTML classes
+
+   USAGE: Add class to HTML element
+   EXAMPLE: <p class="text-center">Centered text</p>
+*/
+
+/* WHY create utility classes?
+   PHILOSOPHY: Some styles are too simple to warrant custom CSS
+   BENEFIT: Apply common patterns directly in HTML
+   ALTERNATIVE: Utility-first frameworks (Tailwind CSS) */
+
+/* TEXT ALIGNMENT UTILITIES */
+.text-center {
+    /* WHY: Sometimes need centered text
+       USAGE: <div class="text-center">This text centered</div>
+       ALTERNATIVE: Add text-align: center to specific element */
+    text-align: center;
+}
+
+.text-right {
+    /* WHY: Right-align specific elements
+       USAGE: <p class="text-right">Date: May 27, 2026</p>
+       WHEN: Dates, signatures, call-to-action buttons */
+    text-align: right;
+}
+
+/* SPACING UTILITIES */
+.mb-1 {
+    /* WHY: Add bottom margin to specific elements
+       mb = margin-bottom, 1 = small size
+       USAGE: <img class="mb-1" ...>
+       WHEN: Need extra space below element */
+    margin-bottom: var(--spacing-sm);
+}
+
+.mb-2 {
+    /* WHY: Larger bottom margin
+       USAGE: <section class="mb-2">
+       WHEN: Need significant space before next section */
+    margin-bottom: var(--spacing-md);
+}
+
+.mt-1 {
+    /* WHY: Add top margin
+       mt = margin-top
+       USAGE: <p class="mt-1">
+       WHEN: Need space above element */
+    margin-top: var(--spacing-sm);
+}
+
+.mt-2 {
+    /* WHY: Larger top margin
+       USAGE: <div class="mt-2">
+       WHEN: Need major vertical separation */
+    margin-top: var(--spacing-md);
+}
+
+/* --------------------------------------------
+   SECTION 13: ACCESSIBILITY IMPROVEMENTS
+   --------------------------------------------
+
+   Purpose: Make website usable for everyone
+   WHY: Accessibility is not optional - it's essential
+   WHO BENEFITS: Screen reader users, keyboard users, vision impaired
+*/
+
+/* SKIP LINK FOR SCREEN READERS */
+.skip-link {
+    /* WHY position: absolute?
+       WHAT: Removes from normal document flow
+       WHY: Can position anywhere regardless of layout */
+    position: absolute;
+
+    /* WHY top: -40px (off-screen)?
+       - Hides link visually
+       - Still exists for screen readers
+       - Still accessible via keyboard
+       WHY NEGATIVE: Positions above viewport (invisible) */
+    top: -40px;
+
+    /* WHY left: 0?
+       - Positions at left edge when visible
+       - Standard location for skip links */
+    left: 0;
+
+    /* Styling when visible */
+    background: var(--primary-color);
+    color: var(--white);
+    padding: var(--spacing-xs);
+    text-decoration: none;
+
+    /* WHY z-index: 100?
+       - Appears above all other content when focused
+       - High number ensures visibility
+       - Critical for keyboard navigation */
+    z-index: 100;
+}
+
+.skip-link:focus {
+    /* WHY top: 0 on focus?
+       MAGIC: When user tabs to link, it appears!
+       HOW: Keyboard focus moves top from -40px to 0
+       RESULT: Link slides into view
+
+       WHY?
+       - Keyboard users can skip navigation
+       - Jumps directly to main content
+       - Saves time, improves accessibility
+
+       WCAG REQUIREMENT: Level A (essential) */
+    top: 0;
+}
+
+/* ENHANCED FOCUS INDICATORS */
+*:focus-visible {
+    /* WHY :focus-visible instead of :focus?
+       DIFFERENCE:
+       - :focus = applies when clicked OR tabbed
+       - :focus-visible = applies only when keyboard tabbed
+
+       WHY BETTER?
+       - Mouse users don't see outline (cleaner)
+       - Keyboard users DO see outline (accessible)
+       - Best of both worlds
+
+       BROWSER SUPPORT: Modern browsers only */
+
+    /* WHY 3px outline?
+       - Thicker = more visible
+       - Essential for low vision users
+       - WCAG requires visible focus indicators */
+    outline: 3px solid var(--hover-color);
+
+    /* WHY outline-offset?
+       - 2px space between element and outline
+       - Makes outline stand out
+       - Easier to see against element */
+    outline-offset: 2px;
+}
+
+/* --------------------------------------------
+   SECTION 14: PERFORMANCE OPTIMIZATIONS
+   --------------------------------------------
+
+   Purpose: Make website faster and smoother
+   WHY: Performance affects user experience and SEO
+*/
+
+/* SMOOTH SCROLLING */
+html {
+    /* WHY scroll-behavior: smooth?
+       DEFAULT: Instant jump to anchor links
+       SMOOTH: Animated scroll to links
+
+       WHEN: Click link like <a href="#section2">
+       RESULT: Page smoothly scrolls instead of jumping
+
+       WHY?
+       - Better user experience
+       - Less jarring
+       - Helps users maintain context
+
+       ALTERNATIVE: JavaScript scroll libraries (more complex)
+       BROWSER SUPPORT: Modern browsers (2018+) */
+    scroll-behavior: smooth;
+}
+
+/* HARDWARE ACCELERATION HINTS */
+nav a,
+tbody tr {
+    /* WHY will-change: transform?
+       WHAT: Tells browser "this will animate"
+       RESULT: Browser optimizes rendering
+
+       HOW IT HELPS:
+       - Browser creates separate layer
+       - Animation uses GPU (graphics card)
+       - Smoother transitions
+       - Better performance
+
+       WARNING: Don't overuse!
+       - Only use on elements that actually animate
+       - Too many will-change = worse performance
+
+       WHY THESE ELEMENTS?
+       - nav a: Hover transform effect
+       - tbody tr: Hover background changes
+
+       ALTERNATIVE: transform: translateZ(0) hack (older technique) */
+    will-change: transform;
+}
+
+/* ============================================
+   END OF STYLESHEET
+   ============================================
+
+   SUMMARY OF BEST PRACTICES DEMONSTRATED:
+
+   1. CSS Reset - Consistent starting point
+   2. CSS Variables - Maintainable, themeable
+   3. Semantic HTML - Meaningful element styling
+   4. Responsive Design - Mobile, tablet, desktop
+   5. Flexbox - Modern layout technique
+   6. Transitions - Smooth interactions
+   7. Accessibility - Focus indicators, contrast
+   8. Performance - Hardware acceleration hints
+   9. Typography - Hierarchy and readability
+   10. Color Theory - Consistent brand palette
+   11. Spacing System - Visual rhythm
+   12. Comments - Thorough documentation
+
+   NEXT STEPS FOR LEARNING:
+   - Experiment with variables (change colors/spacing)
+   - Add/remove effects to understand impact
+   - Test on different devices
+   - Validate with browser DevTools
+   - Try building your own components
+
+   REMEMBER: CSS is learned by doing!
+   Break things, fix them, understand why.
+*/
